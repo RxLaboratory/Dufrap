@@ -12,7 +12,7 @@
         <file alias="prev_frame">icones/prev_frame.png</file>
         <file alias="quit">icones/quit.png</file>
         <file alias="stop">icones/stop.png</file>
-        <file alias="logo">logo.png</file>
         <file alias="dufrap">icones/icone_dufrap.png</file>
+        <file alias="logo">icones/logo.png</file>
     </qresource>
 </RCC>

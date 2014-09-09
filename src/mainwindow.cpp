@@ -71,6 +71,22 @@ MainWindow::MainWindow(int argc, char *argv[], QWidget *parent) :
 
     }
 
+
+    //Ajouter les contrôles dans la TaskBar si win
+#ifdef Q_OS_WIN
+
+    //Jumplist
+    QWinJumpList jumplist;
+    jumplist.recent()->setVisible(true);
+    jumplist.frequent()->setVisible(true);
+    //progress
+    taskbarButton = new QWinTaskbarButton(this);
+    taskbarButton->setWindow(windowHandle());
+
+    taskbarProgress = taskbarButton->progress();
+    connect(seekBar, SIGNAL(valueChanged(int)), taskbarProgress, SLOT(setValue(int)));
+#endif
+
 }
 
 

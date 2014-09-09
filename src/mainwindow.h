@@ -6,6 +6,12 @@
 #include <QTime>
 #include "isplayer.h"
 #include "jumpingslider.h"
+#ifdef Q_OS_WIN
+#include <QWinTaskbarButton>
+#include <QWinTaskbarProgress>
+#include <QWinJumpList>
+#include <QWinJumpListCategory>
+#endif
 
 class MainWindow : public QMainWindow, private Ui::MainWindow
 {
@@ -32,7 +38,6 @@ private slots:
     void evalFramerate(qint64 currentFrameDuration);
     void on_actionParam_tres_triggered();
     void on_zoomButton_currentIndexChanged(int index);
-
     void on_actionA_propos_triggered();
 
 private:
@@ -41,6 +46,10 @@ private:
     bool progra; //used to test if a button has been triggered programmatically
     JumpingSlider *seekBar; //seekbar inherits QSlider but handles mouse event differently
     qreal frameRate;
+#ifdef Q_OS_WIN
+    QWinTaskbarButton *taskbarButton;
+    QWinTaskbarProgress *taskbarProgress;
+#endif
 
 protected:
     void dropEvent(QDropEvent *event);
