@@ -17,6 +17,8 @@ MainWindow::MainWindow(int argc, char *argv[], QWidget *parent) :
     iSPlayer = new ISPlayer(this);
     seekBar = new JumpingSlider;
     seekBar->setOrientation(Qt::Horizontal);
+    seekBar->setStyleSheet("selection-background-color: rgb(255, 68, 68);");
+    seekBar->setMaximumHeight(10);
     playControlsLayout->insertWidget(2,seekBar);
 
     //configuring IS Player
@@ -278,12 +280,14 @@ void MainWindow::iSPositionChanged(qint64 position)
 {
     progra = true;
     seekBar->setValue(position);
+    repaint();
     progra = false;
 }
 
 void MainWindow::seeked(int position)
 {
         currentTCLabel->setText(QString::number(position));
+        repaint();
         if (progra) return;
         iSPlayer->seek(position);
 }

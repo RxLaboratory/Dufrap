@@ -1,22 +1,19 @@
 #include "jumpingslider.h"
 #include <QStyleOptionSlider>
 #include <QMouseEvent>
+#include <QStyleFactory>
 
 JumpingSlider::JumpingSlider(QWidget *parent) :
-    QSlider(parent)
+    QProgressBar(parent)
 {
-
+    setTextVisible(false);
+    setStyle(QStyleFactory::create("Fusion"));
 }
 
 
-void JumpingSlider::mousePressEvent ( QMouseEvent * event )
+void JumpingSlider::mouseMoveEvent ( QMouseEvent * event )
 {
-  QStyleOptionSlider opt;
-  initStyleOption(&opt);
-  QRect sr = style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle, this);
 
-  if (event->button() == Qt::LeftButton && sr.contains(event->pos()) == false)
-  {
     int newVal;
     if (orientation() == Qt::Vertical)
        newVal = minimum() + ((maximum()-minimum()) * (height()-event->y())) / height();
@@ -29,6 +26,6 @@ void JumpingSlider::mousePressEvent ( QMouseEvent * event )
         setValue(newVal);
 
     event->accept();
-  }
-  QSlider::mousePressEvent(event);
+
+  QProgressBar::mousePressEvent(event);
 }
