@@ -27,6 +27,8 @@ private slots:
     void on_favsList_itemDoubleClicked();
     void on_recentList_itemDoubleClicked(QListWidgetItem *item);
     void on_addToFavs_clicked();
+    void on_upButton_clicked();
+    void on_downButton_clicked();
 
 private:
     QStringList frames;

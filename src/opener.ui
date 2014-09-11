@@ -216,9 +216,6 @@
              <height>32</height>
             </size>
            </property>
-           <property name="checkable">
-            <bool>true</bool>
-           </property>
            <property name="toolButtonStyle">
             <enum>Qt::ToolButtonTextBesideIcon</enum>
            </property>
@@ -241,9 +238,6 @@
              <width>32</width>
              <height>32</height>
             </size>
-           </property>
-           <property name="checkable">
-            <bool>true</bool>
            </property>
            <property name="toolButtonStyle">
             <enum>Qt::ToolButtonTextBesideIcon</enum>
