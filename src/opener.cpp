@@ -8,17 +8,7 @@ Opener::Opener(QWidget *parent) :
 {
     setupUi(this);
 
-    //charger les favs
-    QJsonArray favsArray = getFavs();
-
-    for(int i = 0;i<favsArray.count();i++)
-    {
-        QJsonValue fav = favsArray[i];
-        if (fav.toObject().value("type").toString() == "imageSequence")
-        {
-            favsList->addItem(fav.toObject().value("url").toString());
-        }
-    }
+    refreshFavs();
 
     //charger les récents
     QJsonArray recentArray = getRecents();
@@ -131,19 +121,6 @@ void Opener::on_file_clicked()
         {
             frames = getSequence(fichier);
 
-            if (addToFavs->isChecked())
-            {
-                //charger les anciens favs
-                QJsonArray favsArray = getFavs();
-
-                QJsonObject newFavs;
-                newFavs.insert("type","imageSequence");
-                newFavs.insert("url",frames[0]);
-                favsArray.append(newFavs);
-
-                setFavs(favsArray);
-            }
-
             addRecent();
 
             accept();
@@ -165,20 +142,6 @@ void Opener::on_folder_clicked()
             {
                 frames << dossier + "/" + f;
             }
-
-            if (addToFavs->isChecked())
-            {
-                //charger les anciens favs
-                QJsonArray favsArray = getFavs();
-
-                QJsonObject newFavs;
-                newFavs.insert("type","imageSequence");
-                newFavs.insert("url",frames[0]);
-                favsArray.append(newFavs);
-
-                setFavs(favsArray);
-            }
-
 
             //recent
             addRecent();
@@ -271,6 +234,23 @@ void Opener::addRecent()
     }
 
     setRecent(recentArray);
+}
+
+void Opener::refreshFavs()
+{
+    //vider le tableau
+    favsList->clear();
+    //charger
+    QJsonArray favsArray = getFavs();
+
+    for(int i = 0;i<favsArray.count();i++)
+    {
+        QJsonValue fav = favsArray[i];
+        if (fav.toObject().value("type").toString() == "imageSequence")
+        {
+            favsList->addItem(fav.toObject().value("url").toString());
+        }
+    }
 }
 
 QStringList Opener::getFrames()
@@ -380,3 +360,22 @@ void Opener::keyPressEvent(QKeyEvent *event)
     }
 }
 
+void Opener::on_addToFavs_clicked()
+{
+    //charger les anciens favs
+    QJsonArray favsArray = getFavs();
+    //charger les récents
+    QJsonArray recent = getRecents();
+
+    //pour chaque élément de la sélection
+    foreach(QListWidgetItem *item,recentList->selectedItems())
+    {
+        QJsonObject newFavs;
+        newFavs.insert("type","imageSequence");
+        newFavs.insert("url",item->text());
+        favsArray.append(newFavs);
+    }
+    setFavs(favsArray);
+
+    refreshFavs();
+}

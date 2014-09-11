@@ -26,6 +26,7 @@ private slots:
     void on_folder_clicked();
     void on_favsList_itemDoubleClicked();
     void on_recentList_itemDoubleClicked(QListWidgetItem *item);
+    void on_addToFavs_clicked();
 
 private:
     QStringList frames;
@@ -35,6 +36,7 @@ private:
     QJsonArray getRecents();
     void setRecent(QJsonArray recentArray);
     void addRecent();
+    void refreshFavs();
 protected:
     virtual void keyPressEvent(QKeyEvent *event);
 
