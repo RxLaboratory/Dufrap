@@ -14,5 +14,7 @@
         <file alias="stop">icones/stop.png</file>
         <file alias="dufrap">icones/icone_dufrap.png</file>
         <file alias="logo">icones/logo.png</file>
+        <file alias="down">icones/down.png</file>
+        <file alias="up">icones/up.png</file>
     </qresource>
 </RCC>

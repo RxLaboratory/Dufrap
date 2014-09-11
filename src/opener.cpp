@@ -19,6 +19,17 @@ Opener::Opener(QWidget *parent) :
             favsList->addItem(fav.toObject().value("url").toString());
         }
     }
+
+    //charger les récents
+    QJsonArray recentArray = getRecents();
+    for(int i = 0;i<recentArray.count();i++)
+    {
+        QJsonValue recent = recentArray[i];
+        if (recent.toObject().value("type").toString() == "imageSequence")
+        {
+            recentList->addItem(recent.toObject().value("url").toString());
+        }
+    }
 }
 
 void Opener::setTitle(QString t)
@@ -133,6 +144,8 @@ void Opener::on_file_clicked()
                 setFavs(favsArray);
             }
 
+            addRecent();
+
             accept();
         }
 
@@ -165,6 +178,11 @@ void Opener::on_folder_clicked()
 
                 setFavs(favsArray);
             }
+
+
+            //recent
+            addRecent();
+
             accept();
     }
 }
@@ -196,6 +214,65 @@ void Opener::setFavs(QJsonArray favsArray)
     }
 }
 
+QJsonArray Opener::getRecents()
+{
+    QJsonDocument recentDoc;
+    QString recentName;
+    recentName = "/Dumep/recent.dumep";
+    QFile recentFile(QDir::homePath() + recentName);
+    if (recentFile.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        QTextStream in(&recentFile);
+        recentDoc = QJsonDocument::fromJson(in.readAll().toUtf8());
+        recentFile.close();
+    }
+    if (recentDoc.isArray()) return recentDoc.array();
+    else return QJsonArray();
+}
+
+void Opener::setRecent(QJsonArray recentArray)
+{
+    QJsonDocument recentDoc = QJsonDocument(recentArray);
+    //écrire dans le fichier
+    QString recentName;
+    recentName = "/Dumep/recent.dumep";
+    QFile recentFile(QDir::homePath() + recentName);
+    if (recentFile.open(QIODevice::WriteOnly | QIODevice::Text))
+    {
+        QTextStream out(&recentFile);
+        out << recentDoc.toJson();
+        recentFile.close();
+    }
+}
+
+void Opener::addRecent()
+{
+    //recent
+    QJsonArray recentArray = getRecents();
+    QJsonObject newRecent;
+    newRecent.insert("type","imageSequence");
+    newRecent.insert("url",frames[0]);
+    if (recentArray.contains(newRecent))
+    {
+        for(int i =0;i<recentArray.count();i++)
+        {
+            if (recentArray[i] == newRecent)
+            {
+                recentArray.removeAt(i);
+                break;
+            }
+        }
+    }
+
+    recentArray.prepend(newRecent);
+    if (recentArray.count() > 10)
+    {
+        recentArray.removeLast();
+    }
+
+    setRecent(recentArray);
+}
+
 QStringList Opener::getFrames()
 {
     return frames;
@@ -209,6 +286,21 @@ void Opener::on_favsList_itemDoubleClicked()
     {
         QString fs = open.value("url").toString();
         frames = getSequence(fs);
+
+        //recent
+        addRecent();
+    }
+    accept();
+}
+
+void Opener::on_recentList_itemDoubleClicked(QListWidgetItem *item)
+{
+    QJsonArray recent = getRecents();
+    QJsonObject open = recent.at(recentList->currentRow()).toObject();
+    if (open.value("type").toString() == "imageSequence")
+    {
+        QString fs = open.value("url").toString();
+        frames = getSequence(fs);
     }
     accept();
 }
@@ -217,35 +309,70 @@ void Opener::keyPressEvent(QKeyEvent *event)
 {
     if (event->key() == Qt::Key_Delete)
     {
-        while(favsList->selectedItems().count() > 0)
+        if (favsList->hasFocus())
         {
-            int row = favsList->row(favsList->selectedItems().first());
-            QListWidgetItem *item = favsList->takeItem(row);
-            QJsonArray favs;
-            favs = getFavs();
-            favs.removeAt(row);
-            setFavs(favs);
-            delete item;
+            while(favsList->selectedItems().count() > 0)
+            {
+                int row = favsList->row(favsList->selectedItems().first());
+                QListWidgetItem *item = favsList->takeItem(row);
+                QJsonArray favs;
+                favs = getFavs();
+                favs.removeAt(row);
+                setFavs(favs);
+                delete item;
+            }
+            event->accept();
         }
-        event->accept();
+        else if (recentList->hasFocus())
+        {
+            while(recentList->selectedItems().count() > 0)
+            {
+                int row = recentList->row(recentList->selectedItems().first());
+                QListWidgetItem *item = recentList->takeItem(row);
+                QJsonArray recent;
+                recent = getRecents();
+                recent.removeAt(row);
+                setRecent(recent);
+                delete item;
+            }
+            event->accept();
+        }
     }
     else if (event->key() == Qt::Key_Return)
     {
-        QJsonArray favs = getFavs();
-        foreach(QListWidgetItem *item,favsList->selectedItems())
+        if (favsList->hasFocus())
         {
-            QJsonObject open = favs.at(favsList->row(item)).toObject();
+            QJsonArray favs = getFavs();
+            QJsonObject open = favs.at(favsList->currentRow()).toObject();
             if (open.value("type").toString() == "imageSequence")
             {
-                QJsonArray fs = open.value("url").toArray();
-                for (int i = 0;i<fs.count();i++)
+                QString fs = open.value("url").toString();
+                frames = getSequence(fs);
+
+                //recent
+                addRecent();
+            }
+            event->accept();
+            accept();
+        }
+        else if (recentList->hasFocus())
+        {
+            QJsonArray recent = getRecents();
+            foreach(QListWidgetItem *item,recentList->selectedItems())
+            {
+                QJsonObject open = recent.at(recentList->row(item)).toObject();
+                if (open.value("type").toString() == "imageSequence")
                 {
-                    frames << fs[i].toString();
+                    QJsonArray fs = open.value("url").toArray();
+                    for (int i = 0;i<fs.count();i++)
+                    {
+                        frames << fs[i].toString();
+                    }
                 }
             }
+            event->accept();
+            accept();
         }
-        event->accept();
-        accept();
     }
     else
     {
