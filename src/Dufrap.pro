@@ -24,7 +24,9 @@ SOURCES += main.cpp\
     imagebuffer.cpp \
     unbufferedframe.cpp \
     params.cpp \
-    about.cpp
+    about.cpp \
+    bufferslider.cpp \
+    framelabel.cpp
 
 HEADERS  += mainwindow.h \
     opener.h \
@@ -34,12 +36,15 @@ HEADERS  += mainwindow.h \
     imagebuffer.h \
     unbufferedframe.h \
     params.h \
-    about.h
+    about.h \
+    bufferslider.h \
+    framelabel.h
 
 FORMS    += mainwindow.ui \
     opener.ui \
     params.ui \
-    about.ui
+    about.ui \
+    bufferslider.ui
 
 RESOURCES += \
     ressources.qrc

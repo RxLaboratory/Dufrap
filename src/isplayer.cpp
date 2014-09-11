@@ -88,9 +88,11 @@ void ISPlayer::newBufferedFrame(BufferedFrame *f)
 void ISPlayer::emptyBuffer()
 {
     //empty buffer
+    int i = -1;
     while(buffer.count() > 0)
     {
         BufferedFrame *f = buffer.takeFirst();
+        emit removedFrameFromBuffer(i++);
         delete f;
     }
     isBuffered.clear();
@@ -120,6 +122,7 @@ void ISPlayer::insertBufferedFrame(BufferedFrame *f)
     buffer.insert(frameNumber,f);
     isBuffered[frameNumber] = true;
     bufferSize++;
+    emit adddedFrameToBuffer(frameNumber);
     /*//si c'est la currentframe on en profite pour l'afficher
     if (frameNumber == currentFrame)
     {
@@ -139,6 +142,7 @@ bool ISPlayer::removeFirstBufferedFrame()
             buffer.insert(i,new BufferedFrame("",-1));
             bufferSize--;
             isBuffered[i] = false;
+            emit removedFrameFromBuffer(i);
             return true;
         }
     }
@@ -157,6 +161,7 @@ bool ISPlayer::removeLastBufferedFrame()
             buffer.insert(i,new BufferedFrame("",-1));
             bufferSize--;
             isBuffered[i] = false;
+            emit removedFrameFromBuffer(i);
             break;
             return true;
         }

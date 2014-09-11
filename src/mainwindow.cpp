@@ -6,6 +6,7 @@
 #include "opener.h"
 #include "params.h"
 #include "about.h"
+#include <QStyleFactory>
 
 MainWindow::MainWindow(int argc, char *argv[], QWidget *parent) :
     QMainWindow(parent)
@@ -19,7 +20,14 @@ MainWindow::MainWindow(int argc, char *argv[], QWidget *parent) :
     seekBar->setOrientation(Qt::Horizontal);
     seekBar->setStyleSheet("selection-background-color: rgb(255, 68, 68);");
     seekBar->setMaximumHeight(10);
-    playControlsLayout->insertWidget(2,seekBar);
+    playControlsLayout->insertWidget(0,seekBar);
+
+    bufferSlider = new BufferSlider(this);
+    bufferSlider->setBgColorCSS("background-color: rgb(137, 31, 31);");
+    playControlsLayout->insertWidget(1,bufferSlider);
+
+    bufferBar->setStyleSheet("selection-background-color: rgb(137, 31, 31);");
+    bufferBar->setStyle(QStyleFactory::create("Fusion"));
 
     //configuring IS Player
     connect(iSPlayer,&ISPlayer::bufferState,this,&MainWindow::iSBufferStatusChanged);
@@ -29,6 +37,8 @@ MainWindow::MainWindow(int argc, char *argv[], QWidget *parent) :
     connect(iSPlayer,&ISPlayer::mediaStatusChanged,this,&MainWindow::iSStatusChanged);
     connect(seekBar,&JumpingSlider::valueChanged,this,&MainWindow::seeked);
     connect(iSPlayer,&ISPlayer::frameTime,this,&MainWindow::evalFramerate);
+    connect(iSPlayer,&ISPlayer::adddedFrameToBuffer,bufferSlider,&BufferSlider::setBufferedFrame);
+    connect(iSPlayer,&ISPlayer::removedFrameFromBuffer,bufferSlider,&BufferSlider::setUnBufferedFrame);
     mainLayout->insertWidget(0,iSPlayer);
     iSPlayer->setFrameRate(25);
 
@@ -262,6 +272,7 @@ void MainWindow::iSDurationChanged(qint64 duration)
     {
         durationLabel->setText(QString::number(duration));
     }
+    bufferSlider->setNumFrames(duration);
     seekBar->setMaximum(duration);
 }
 

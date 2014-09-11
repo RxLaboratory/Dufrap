@@ -27,6 +27,8 @@ signals:
     void bufferState(int);
     void durationChanged(int);
     void frameTime(qint64 ms);
+    void removedFrameFromBuffer(int f);
+    void adddedFrameToBuffer(int f);
 
 public slots:
     void play(bool ignoreEmptyBuffer = false);

@@ -6,6 +6,7 @@
 #include <QTime>
 #include "isplayer.h"
 #include "jumpingslider.h"
+#include "bufferslider.h"
 #ifdef Q_OS_WIN
 #include <QWinTaskbarButton>
 #include <QWinTaskbarProgress>
@@ -47,6 +48,7 @@ private:
     JumpingSlider *seekBar; //seekbar inherits QSlider but handles mouse event differently
     qreal frameRate;
     bool buttonStyleAuto;
+    BufferSlider *bufferSlider;
 #ifdef Q_OS_WIN
     QWinTaskbarButton *taskbarButton;
     QWinTaskbarProgress *taskbarProgress;
