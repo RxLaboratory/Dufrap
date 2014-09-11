@@ -59,6 +59,22 @@ MainWindow::MainWindow(int argc, char *argv[], QWidget *parent) :
 
     this->setAcceptDrops(true);
 
+    //adding a folder in the home folder for preferences and favs
+    QDir::home().mkdir("Dumep");
+
+    buttonStyleAuto = true;
+
+    //charge les préférences
+    Params p(this);
+    Qt::ToolButtonStyle style = p.getStyle();
+    if (style == Qt::ToolButtonFollowStyle) buttonStyleAuto = true;
+    else
+    {
+        buttonStyleAuto = false;
+        mainToolBar->setToolButtonStyle(style);
+    }
+
+
     //load arguments
     if (argc > 1)
     {
@@ -201,54 +217,27 @@ void MainWindow::on_actionParam_tres_triggered()
 {
     Params p;
 
-
-    //récupérer les params enregistrés
-    QJsonDocument paramsDoc;
-    QJsonObject params;
-    QFile paramsFile(QDir::homePath() + "/Dumep/params.dufrap");
-    if (paramsFile.exists())
-    {
-        if (paramsFile.open(QIODevice::ReadOnly | QIODevice::Text))
-        {
-            QTextStream in(&paramsFile);
-            paramsDoc = QJsonDocument::fromJson(in.readAll().toUtf8());
-            paramsFile.close();
-        }
-        params = paramsDoc.object();
-
-        p.setBufferMaxSize(params.value("bufferMaxSize").toInt());
-        p.setBufferAhead(params.value("bufferAhead").toInt());
-        p.setSkipFrames(params.value("skipFrames").toBool());
-        p.setBufferEnabled(params.value("bufferEnabled").toBool());
-
-    }
-    else
-    {
-        p.setBufferEnabled(true);
-        p.setBufferMaxSize(200);
-        p.setBufferAhead(50);
-        p.setSkipFrames(false);
-    }
-
     if (p.exec())
     {
-        params.insert("bufferEnabled",QJsonValue(p.getBufferEnabled()));
-        params.insert("bufferMaxSize",QJsonValue(p.getBufferMaxSize()));
-        params.insert("bufferAhead",QJsonValue(p.getBufferAhead()));
-        params.insert("skipFrames",QJsonValue(p.getSkipFrames()));
+
         iSPlayer->setBufferEnabled(p.getBufferEnabled());
         iSPlayer->setBufferMaxSize(p.getBufferMaxSize());
         iSPlayer->setBufferAhead(p.getBufferAhead());
         iSPlayer->setSkipFrames(p.getSkipFrames());
 
-        //enregistrer les params
-        paramsDoc.setObject(params);
-        //écrire dans le fichier
-        if (paramsFile.open(QIODevice::WriteOnly | QIODevice::Text))
+        Qt::ToolButtonStyle style = p.getStyle();
+
+        if (style == Qt::ToolButtonFollowStyle)
         {
-            QTextStream out(&paramsFile);
-            out << paramsDoc.toJson();
-            paramsFile.close();
+            buttonStyleAuto = true;
+            if (this->width() > 790) mainToolBar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+            else if (this->width() > 540) mainToolBar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+            else mainToolBar->setToolButtonStyle(Qt::ToolButtonIconOnly);
+        }
+        else
+        {
+            buttonStyleAuto = false;
+            mainToolBar->setToolButtonStyle(style);
         }
     }
 }
@@ -533,23 +522,14 @@ void MainWindow::keyReleaseEvent(QKeyEvent *event)
 
 void MainWindow::resizeEvent(QResizeEvent* )
 {
-    /*if (iSPlayer->pixmap())
+    if (buttonStyleAuto)
     {
-        int iWidth = iSPlayer->pixmap()->size().width();
-        int iHeight = iSPlayer->pixmap()->size().height();
-        qreal iAspectRatio = (iWidth+0.0)/iHeight;
-        qreal aspectRatio = (screenWidget->size().width()+0.0)/screenWidget->size().height();
-        if (aspectRatio>iAspectRatio)
-        {
-            iSPlayer->resize(screenWidget->size().height()*iAspectRatio,screenWidget->size().height());
-        }
-        else
-        {
-            iSPlayer->resize(screenWidget->size().width(),screenWidget->size().width()/iAspectRatio);
-        }
-    }*/
-
+        if (this->width() > 790) mainToolBar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+        else if (this->width() > 540) mainToolBar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+        else mainToolBar->setToolButtonStyle(Qt::ToolButtonIconOnly);
+    }
 }
+
 
 
 

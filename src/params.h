@@ -2,6 +2,11 @@
 #define PARAMS_H
 
 #include "ui_params.h"
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QFile>
+#include <QDir>
+#include <QTextStream>
 
 class Params : public QDialog, private Ui::Params
 {
@@ -19,10 +24,20 @@ public:
     int getBufferAhead();
     bool getSkipFrames();
 
+    Qt::ToolButtonStyle getStyle();
+    void setStyle(Qt::ToolButtonStyle style);
+
 private slots:
     void on_maxSlider_valueChanged(int value);
     void on_buttonBox_accepted();
     void on_buttonBox_rejected();
+    void on_comboBox_activated(int index);
+private:
+    QJsonObject getParams();
+    void setParams(QJsonObject p);
+    bool buttonStyleAuto;
+protected:
+    void resizeEvent(QResizeEvent*);
 };
 
 #endif // PARAMS_H

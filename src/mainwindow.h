@@ -46,6 +46,7 @@ private:
     bool progra; //used to test if a button has been triggered programmatically
     JumpingSlider *seekBar; //seekbar inherits QSlider but handles mouse event differently
     qreal frameRate;
+    bool buttonStyleAuto;
 #ifdef Q_OS_WIN
     QWinTaskbarButton *taskbarButton;
     QWinTaskbarProgress *taskbarProgress;

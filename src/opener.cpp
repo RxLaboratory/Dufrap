@@ -181,7 +181,7 @@ QJsonArray Opener::getRecents()
 {
     QJsonDocument recentDoc;
     QString recentName;
-    recentName = "/Dumep/recent.dumep";
+    recentName = "/Dumep/recent.dufrap";
     QFile recentFile(QDir::homePath() + recentName);
     if (recentFile.open(QIODevice::ReadOnly | QIODevice::Text))
     {
@@ -198,7 +198,7 @@ void Opener::setRecent(QJsonArray recentArray)
     QJsonDocument recentDoc = QJsonDocument(recentArray);
     //écrire dans le fichier
     QString recentName;
-    recentName = "/Dumep/recent.dumep";
+    recentName = "/Dumep/recent.dufrap";
     QFile recentFile(QDir::homePath() + recentName);
     if (recentFile.open(QIODevice::WriteOnly | QIODevice::Text))
     {
