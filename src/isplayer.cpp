@@ -21,6 +21,7 @@ ISPlayer::ISPlayer(QWidget *parent) :
     bufferEnabled = true;
     skipFrames = false;
     progra = false;
+    loop = false;
     this->setScaledContents(true);
     this->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
 }
@@ -178,8 +179,7 @@ void ISPlayer::displayFrame(int f)
     {
         //on l'ajoute au buffer
         BufferedFrame *pix = new BufferedFrame(frames[f].getFilePath(),f);
-        buffer[f] = pix;
-        isBuffered[f] = true;
+        newBufferedFrame(pix);
         emit adddedFrameToBuffer(f);
         this->setPixmap(pix->getPixmap());
     }
@@ -252,10 +252,14 @@ void ISPlayer::play(bool ignoreEmptyBuffer)
 {
     //vérifs de sécurité
     if (frames.count() ==0) stop();
-    if (currentFrame < 0 || currentFrame >= frames.count()-1)
+    if (currentFrame < 0)
     {
         if (stopped) stop();
         if (paused) pause();
+    }
+    if (currentFrame >= frames.count()-1)
+    {
+        currentFrame = 0;
     }
     //si déjà en lecture dans le bon sens
     if (playing && forward) return;
@@ -356,6 +360,11 @@ void ISPlayer::stop()
     emit frameChanged(0);
 }
 
+void ISPlayer::setLoop(bool l)
+{
+    loop = l;
+}
+
 void ISPlayer::nextFrame()
 {
     if (frames.count() ==0)
@@ -365,8 +374,15 @@ void ISPlayer::nextFrame()
     //if the last frame was already displayed
     if (currentFrame >= frames.count()-1)
     {
-        displayFrame(frames.count() -1);
-        pause();
+        if (loop)
+        {
+            displayFrame(0);
+        }
+        else
+        {
+            displayFrame(frames.count() -1);
+            pause();
+        }
     }
     else
     {

@@ -36,6 +36,7 @@ public slots:
     void seek(int f);
     void setFrameRate(qreal fr);
     void newBufferedFrame(BufferedFrame *f);
+    void setLoop(bool l);
 private:
     qreal frameRate;
     int currentFrame;
@@ -50,6 +51,7 @@ private:
     bool playing;
     bool stopped;
     bool progra;
+    bool loop;
     QTimer *displayTimer;
     QTimer *reverseTimer;
     QList<UnBufferedFrame> frames;

@@ -206,7 +206,7 @@ void MainWindow::on_actionLecture_triggered(bool checked)
 
 void MainWindow::on_actionBoucle_triggered(bool checked)
 {
-    //TODO
+    iSPlayer->setLoop(checked);
 }
 
 void MainWindow::on_actionStop_triggered()
