@@ -17,6 +17,7 @@ Params::Params(QWidget *parent) :
     setBufferAhead(params.value("bufferAhead").toInt());
     setSkipFrames(params.value("skipFrames").toBool());
     lastBrowsed = params.value("lastBrowsed").toString();
+    lastFPS = params.value("lastFPS").toDouble();
 }
 
 void Params::on_maxSlider_valueChanged(int value)
@@ -168,6 +169,17 @@ QString Params::getLastBrowsed()
     return lastBrowsed;
 }
 
+void Params::setLastFPS(double fps)
+{
+    lastFPS = fps;
+    on_buttonBox_accepted();
+}
+
+double Params::getLastFPS()
+{
+    return lastFPS;
+}
+
 QJsonObject Params::getParams()
 {
     //charger
@@ -192,6 +204,7 @@ QJsonObject Params::getParams()
         params.insert("skipFrames",false);
         params.insert("buttonStyle",Qt::ToolButtonFollowStyle);
         params.insert("lastBrowsed","");
+        params.insert("lastFPS",25);
         paramsDoc.setObject(params);
         if (paramsFile.open(QIODevice::WriteOnly | QIODevice::Text))
         {
@@ -226,6 +239,7 @@ void Params::on_buttonBox_accepted()
     params.insert("bufferAhead",getBufferAhead());
     params.insert("skipFrames",getSkipFrames());
     params.insert("lastBrowsed",lastBrowsed);
+    params.insert("lastFPS",lastFPS);
     setParams(params);
     accept();
 }

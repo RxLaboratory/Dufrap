@@ -30,6 +30,9 @@ public:
     void setLastBrowsed(QString l);
     QString getLastBrowsed();
 
+    void setLastFPS(double fps);
+    double getLastFPS();
+
 private slots:
     void on_maxSlider_valueChanged(int value);
     void on_buttonBox_accepted();
@@ -40,6 +43,7 @@ private:
     void setParams(QJsonObject p);
     bool buttonStyleAuto;
     QString lastBrowsed;
+    double lastFPS;
 protected:
     void resizeEvent(QResizeEvent*);
 };

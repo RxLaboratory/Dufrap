@@ -93,6 +93,7 @@ MainWindow::MainWindow(int argc, char *argv[], QWidget *parent) :
         buttonStyleAuto = false;
         mainToolBar->setToolButtonStyle(style);
     }
+    fpsBox->setCurrentText(QString::number(p.getLastFPS()) + " fps");
 
 
     //load arguments
@@ -283,6 +284,8 @@ void MainWindow::on_fpsBox_currentIndexChanged(int index)
     if (index == 10)
         frameRate = 60;
 
+    Params p;
+    p.setLastFPS(frameRate);
     iSPlayer->setFrameRate(frameRate);
 
 }
