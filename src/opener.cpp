@@ -260,7 +260,9 @@ void Opener::addRecent()
     }
 
     recentArray.prepend(newRecent);
-    if (recentArray.count() > 10)
+
+    Params p;
+    if (recentArray.count() > p.getNumRecents())
     {
         recentArray.removeLast();
     }

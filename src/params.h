@@ -33,17 +33,25 @@ public:
     void setLastFPS(double fps);
     double getLastFPS();
 
+    void setNumRecents(int n);
+    int getNumRecents();
+
+    QStringList getRVB();
+    void setRVB(QList<int> c);
+
 private slots:
     void on_maxSlider_valueChanged(int value);
     void on_buttonBox_accepted();
     void on_buttonBox_rejected();
     void on_comboBox_activated(int index);
+
 private:
     QJsonObject getParams();
     void setParams(QJsonObject p);
     bool buttonStyleAuto;
     QString lastBrowsed;
     double lastFPS;
+    bool progra;
 protected:
     void resizeEvent(QResizeEvent*);
 };

@@ -52,31 +52,6 @@ MainWindow::MainWindow(int argc, char *argv[], QWidget *parent) :
     mainLayout->insertWidget(0,iSViewer);
     isMovie = false;
 
-    //récupérer les params enregistrés
-    QDir::home().mkdir("Dumep");
-    QJsonDocument paramsDoc;
-    QJsonObject params;
-    QFile paramsFile(QDir::homePath() + "/Dumep/params.dufrap");
-    if (paramsFile.exists())
-    {
-        if (paramsFile.open(QIODevice::ReadOnly | QIODevice::Text))
-        {
-            QTextStream in(&paramsFile);
-            paramsDoc = QJsonDocument::fromJson(in.readAll().toUtf8());
-            paramsFile.close();
-        }
-        params = paramsDoc.object();
-
-        iSPlayer->setBufferMaxSize(params.value("bufferMaxSize").toInt());
-        iSPlayer->setBufferEnabled(params.value("bufferEnabled").toBool());
-        iSPlayer->setBufferAhead(params.value("bufferAhead").toInt());
-        iSPlayer->setSkipFrames(params.value("skipFrames").toBool());
-    }
-
-    frameRate = 25;
-
-    progra = false;
-
     this->setAcceptDrops(true);
 
     //adding a folder in the home folder for preferences and favs
@@ -85,7 +60,7 @@ MainWindow::MainWindow(int argc, char *argv[], QWidget *parent) :
     buttonStyleAuto = true;
 
     //charge les préférences
-    Params p(this);
+    Params p;
     Qt::ToolButtonStyle style = p.getStyle();
     if (style == Qt::ToolButtonFollowStyle) buttonStyleAuto = true;
     else
@@ -93,8 +68,22 @@ MainWindow::MainWindow(int argc, char *argv[], QWidget *parent) :
         buttonStyleAuto = false;
         mainToolBar->setToolButtonStyle(style);
     }
+    frameRate = 25;
     fpsBox->setCurrentText(QString::number(p.getLastFPS()) + " fps");
 
+    iSPlayer->setBufferMaxSize(p.getBufferMaxSize());
+    iSPlayer->setBufferEnabled(p.getBufferEnabled());
+    iSPlayer->setBufferAhead(p.getBufferAhead());
+    iSPlayer->setSkipFrames(p.getSkipFrames());
+
+    QStringList bgColor = p.getRVB();
+    if (!bgColor.contains("-1"))
+    {
+        QString bgCSS = "background-color: rgb(" + bgColor.join(",") + ");";
+        iSViewer->setStyleSheet(bgCSS);
+    }
+
+    progra = false;
 
     //load arguments
     if (argc > 1)
@@ -261,6 +250,7 @@ void MainWindow::on_actionImage_pr_c_dente_triggered()
 
 void MainWindow::on_fpsBox_currentIndexChanged(int index)
 {
+    if (progra) return;
     if (index == 0)
         frameRate = 8;
     if (index == 1)
@@ -365,6 +355,18 @@ void MainWindow::on_actionParam_tres_triggered()
             buttonStyleAuto = false;
             mainToolBar->setToolButtonStyle(style);
         }
+
+        QStringList bgColor = p.getRVB();
+        if (!bgColor.contains("-1"))
+        {
+            QString bgCSS = "background-color: rgb(" + bgColor.join(",") + ");";
+            iSViewer->setStyleSheet(bgCSS);
+        }
+        else
+        {
+            iSViewer->setStyleSheet("");
+        }
+
     }
 }
 

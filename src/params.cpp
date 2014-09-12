@@ -1,8 +1,10 @@
 #include "params.h"
+#include <QtDebug>
 
 Params::Params(QWidget *parent) :
     QDialog(parent)
 {
+    progra = true;
     setupUi(this);
 
     buttonStyleAuto = true;
@@ -12,12 +14,17 @@ Params::Params(QWidget *parent) :
 
     Qt::ToolButtonStyle style = Qt::ToolButtonStyle(params.value("buttonStyle").toInt());
     setStyle(style);
+    setNumRecents(params.value("numRecents").toInt());
+    QList<int> rvb;
+    rvb << params.value("rBG").toInt() << params.value("vBG").toInt() << params.value("bBG").toInt();
+    setRVB(rvb);
     setBufferEnabled(params.value("bufferEnabled").toBool());
     setBufferMaxSize(params.value("bufferMaxSize").toInt());
     setBufferAhead(params.value("bufferAhead").toInt());
     setSkipFrames(params.value("skipFrames").toBool());
-    lastBrowsed = params.value("lastBrowsed").toString();
-    lastFPS = params.value("lastFPS").toDouble();
+    setLastBrowsed(params.value("lastBrowsed").toString());
+    setLastFPS(params.value("lastFPS").toDouble());
+    progra = false;
 }
 
 void Params::on_maxSlider_valueChanged(int value)
@@ -180,6 +187,30 @@ double Params::getLastFPS()
     return lastFPS;
 }
 
+void Params::setNumRecents(int n)
+{
+    numRecentsSpinner->setValue(n);
+}
+
+int Params::getNumRecents()
+{
+    return numRecentsSpinner->value();
+}
+
+QStringList Params::getRVB()
+{
+    QStringList rvb;
+    rvb << QString::number(rSpinner->value()) << QString::number(vSpinner->value()) << QString::number(bSpinner->value());
+    return rvb;
+}
+
+void Params::setRVB(QList<int> c)
+{
+    rSpinner->setValue(c[0]);
+    vSpinner->setValue(c[1]);
+    bSpinner->setValue(c[2]);
+}
+
 QJsonObject Params::getParams()
 {
     //charger
@@ -205,6 +236,10 @@ QJsonObject Params::getParams()
         params.insert("buttonStyle",Qt::ToolButtonFollowStyle);
         params.insert("lastBrowsed","");
         params.insert("lastFPS",25);
+        params.insert("numRecents",10);
+        params.insert("rBG",-1);
+        params.insert("vBG",-1);
+        params.insert("bBG",-1);
         paramsDoc.setObject(params);
         if (paramsFile.open(QIODevice::WriteOnly | QIODevice::Text))
         {
@@ -240,6 +275,10 @@ void Params::on_buttonBox_accepted()
     params.insert("skipFrames",getSkipFrames());
     params.insert("lastBrowsed",lastBrowsed);
     params.insert("lastFPS",lastFPS);
+    params.insert("numRecents",getNumRecents());
+    params.insert("rBG",rSpinner->value());
+    params.insert("vBG",vSpinner->value());
+    params.insert("bBG",bSpinner->value());
     setParams(params);
     accept();
 }
@@ -258,3 +297,4 @@ void Params::resizeEvent(QResizeEvent*)
         else toolButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
     }
 }
+
