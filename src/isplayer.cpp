@@ -34,6 +34,15 @@ void ISPlayer::setBufferEnabled(bool b)
 void ISPlayer::setBufferMaxSize(int m)
 {
     bufferMaxSize = m;
+    //bufferSize
+    if (bufferMaxSize > frames.count())
+    {
+        currentMaxSize = frames.count();
+    }
+    else
+    {
+        currentMaxSize = bufferMaxSize;
+    }
 }
 
 void ISPlayer::setBufferAhead(int b)
