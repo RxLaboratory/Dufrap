@@ -26,7 +26,7 @@ SOURCES += main.cpp\
     params.cpp \
     about.cpp \
     bufferslider.cpp \
-    framelabel.cpp
+    movielabel.cpp
 
 HEADERS  += mainwindow.h \
     opener.h \
@@ -38,7 +38,7 @@ HEADERS  += mainwindow.h \
     params.h \
     about.h \
     bufferslider.h \
-    framelabel.h
+    movielabel.h
 
 FORMS    += mainwindow.ui \
     opener.ui \

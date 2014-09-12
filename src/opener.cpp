@@ -2,11 +2,15 @@
 #include <QInputDialog>
 #include <QUrl>
 #include <QMessageBox>
+#include <QMovie>
+#include <QtDebug>
 
 Opener::Opener(QWidget *parent) :
     QDialog(parent)
 {
     setupUi(this);
+
+    movie = false;
 
     refreshFavs();
 
@@ -15,7 +19,7 @@ Opener::Opener(QWidget *parent) :
     for(int i = 0;i<recentArray.count();i++)
     {
         QJsonValue recent = recentArray[i];
-        if (recent.toObject().value("type").toString() == "imageSequence")
+        if (recent.toObject().value("type").toString() == "imageSequence" || recent.toObject().value("type").toString() == "movie")
         {
             recentList->addItem(recent.toObject().value("url").toString());
         }
@@ -119,7 +123,16 @@ void Opener::on_file_clicked()
 
         if (fichier != "")
         {
-            frames = getSequence(fichier);
+            if (QMovie::supportedFormats().contains(fichier.section(".",-1).toLower().toUtf8()))
+            {
+                movie = true;
+                movieFile = fichier;
+            }
+            else
+            {
+                frames = getSequence(fichier);
+                movie = false;
+            }
 
             addRecent();
 
@@ -213,8 +226,16 @@ void Opener::addRecent()
     //recent
     QJsonArray recentArray = getRecents();
     QJsonObject newRecent;
-    newRecent.insert("type","imageSequence");
-    newRecent.insert("url",frames[0]);
+    if (movie)
+    {
+        newRecent.insert("type","movie");
+        newRecent.insert("url",movieFile);
+    }
+    else
+    {
+        newRecent.insert("type","imageSequence");
+        newRecent.insert("url",frames[0]);
+    }
     if (recentArray.contains(newRecent))
     {
         for(int i =0;i<recentArray.count();i++)
@@ -246,7 +267,7 @@ void Opener::refreshFavs()
     for(int i = 0;i<favsArray.count();i++)
     {
         QJsonValue fav = favsArray[i];
-        if (fav.toObject().value("type").toString() == "imageSequence")
+        if (fav.toObject().value("type").toString() == "imageSequence" || fav.toObject().value("type").toString() == "movie" )
         {
             favsList->addItem(fav.toObject().value("url").toString());
         }
@@ -258,14 +279,33 @@ QStringList Opener::getFrames()
     return frames;
 }
 
+bool Opener::isMovie()
+{
+    return movie;
+}
+
+QString Opener::getMovie()
+{
+    return movieFile;
+}
+
 void Opener::on_favsList_itemDoubleClicked()
 {
     QJsonArray favs = getFavs();
     QJsonObject open = favs.at(favsList->currentRow()).toObject();
     if (open.value("type").toString() == "imageSequence")
     {
+        movie = false;
         QString fs = open.value("url").toString();
         frames = getSequence(fs);
+
+        //recent
+        addRecent();
+    }
+    else if (open.value("type").toString() == "movie")
+    {
+        movie = true;
+        movieFile = open.value("url").toString();
 
         //recent
         addRecent();
@@ -279,8 +319,14 @@ void Opener::on_recentList_itemDoubleClicked(QListWidgetItem *item)
     QJsonObject open = recent.at(recentList->currentRow()).toObject();
     if (open.value("type").toString() == "imageSequence")
     {
+        movie = false;
         QString fs = open.value("url").toString();
         frames = getSequence(fs);
+    }
+    else if (open.value("type").toString() == "movie")
+    {
+        movie = true;
+        movieFile = open.value("url").toString();
     }
     accept();
 }
@@ -328,6 +374,14 @@ void Opener::keyPressEvent(QKeyEvent *event)
             {
                 QString fs = open.value("url").toString();
                 frames = getSequence(fs);
+                movie = false;
+                //recent
+                addRecent();
+            }
+            else if (open.value("type").toString() == "movie")
+            {
+                movie = true;
+                movieFile = open.value("url").toString();
 
                 //recent
                 addRecent();
@@ -343,11 +397,14 @@ void Opener::keyPressEvent(QKeyEvent *event)
                 QJsonObject open = recent.at(recentList->row(item)).toObject();
                 if (open.value("type").toString() == "imageSequence")
                 {
-                    QJsonArray fs = open.value("url").toArray();
-                    for (int i = 0;i<fs.count();i++)
-                    {
-                        frames << fs[i].toString();
-                    }
+                    QString fs = open.value("url").toString();
+                    frames = getSequence(fs);
+                    movie=false;
+                }
+                else if (open.value("type").toString() == "movie")
+                {
+                    movie = true;
+                    movieFile = open.value("url").toString();
                 }
             }
             event->accept();
@@ -370,9 +427,7 @@ void Opener::on_addToFavs_clicked()
     //pour chaque élément de la sélection
     foreach(QListWidgetItem *item,recentList->selectedItems())
     {
-        QJsonObject newFavs;
-        newFavs.insert("type","imageSequence");
-        newFavs.insert("url",item->text());
+        QJsonObject newFavs = recent[recentList->row(item)].toObject();
         favsArray.append(newFavs);
     }
     setFavs(favsArray);

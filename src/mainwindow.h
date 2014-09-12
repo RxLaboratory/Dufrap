@@ -7,6 +7,8 @@
 #include "isplayer.h"
 #include "jumpingslider.h"
 #include "bufferslider.h"
+#include <QMovie>
+#include "movielabel.h"
 #ifdef Q_OS_WIN
 #include <QWinTaskbarButton>
 #include <QWinTaskbarProgress>
@@ -32,6 +34,7 @@ private slots:
     void on_actionBoucle_triggered(bool checked);
     void iSBufferStatusChanged(int percentFilled);
     void iSStatusChanged(QMediaPlayer::MediaStatus status);
+    void movieStateChanged(QMovie::MovieState state);
     void iSStateChanged(QMediaPlayer::State state);
     void iSPositionChanged(qint64 position);
     void iSDurationChanged(qint64 duration);
@@ -40,15 +43,19 @@ private slots:
     void on_actionParam_tres_triggered();
     void on_zoomButton_currentIndexChanged(int index);
     void on_actionA_propos_triggered();
+    void on_speedBox_valueChanged(double arg1);
 
 private:
     void addFrames(QStringList f);
     ISPlayer *iSPlayer; //Image sequence player and widget
+    MovieLabel *movieLabel; //label displaying movie (GIF or MNG file)
+    QMovie *movie; //movie player
     bool progra; //used to test if a button has been triggered programmatically
     JumpingSlider *seekBar; //seekbar inherits QSlider but handles mouse event differently
     qreal frameRate;
     bool buttonStyleAuto;
     BufferSlider *bufferSlider;
+    bool isMovie;
 #ifdef Q_OS_WIN
     QWinTaskbarButton *taskbarButton;
     QWinTaskbarProgress *taskbarProgress;

@@ -16,6 +16,9 @@ MainWindow::MainWindow(int argc, char *argv[], QWidget *parent) :
 
     //widgets and players
     iSPlayer = new ISPlayer(this);
+    movieLabel = new MovieLabel(this);
+    movie = new QMovie(this);
+    movieLabel->setMovie(movie);
     seekBar = new JumpingSlider;
     seekBar->setOrientation(Qt::Horizontal);
     seekBar->setStyleSheet("selection-background-color: rgb(255, 68, 68);");
@@ -41,6 +44,14 @@ MainWindow::MainWindow(int argc, char *argv[], QWidget *parent) :
     connect(iSPlayer,&ISPlayer::removedFrameFromBuffer,bufferSlider,&BufferSlider::setUnBufferedFrame);
     mainLayout->insertWidget(0,iSPlayer);
     iSPlayer->setFrameRate(25);
+
+    //configuring movie player
+    connect(movie,&QMovie::frameChanged,this,&MainWindow::iSPositionChanged);
+    connect(movie,&QMovie::stateChanged,this,&MainWindow::movieStateChanged);
+    mainLayout->insertWidget(0,movieLabel);
+
+    movieLabel->hide();
+    isMovie = false;
 
     //récupérer les params enregistrés
     QDir::home().mkdir("Dumep");
@@ -135,23 +146,62 @@ void MainWindow::on_actionOuvrir_triggered()
         {
             //stoppe
             iSPlayer->stop();
+            movie->stop();
             //ajoute
-            addFrames(o.getFrames());
+            if (o.isMovie())
+            {
+                iSPlayer->hide();
+                movieLabel->show();
+                fpsBox->hide();
+                bufferBar->hide();
+                speedBox->show();
+                speedBox->setValue(1.0);
+                isMovie = true;
+                movieLabel->setMovieFile(o.getMovie());
+                seekBar->setMaximum(movie->frameCount());
+                //displaying first frame
+                movie->jumpToFrame(0);
+            }
+            else
+            {
+                iSPlayer->show();
+                movieLabel->hide();
+                fpsBox->show();
+                bufferBar->show();
+                speedBox->hide();
+                isMovie = false;
+                addFrames(o.getFrames());
+            }
+
         }
 }
 
 void MainWindow::on_actionQuitter_triggered()
 {
     iSPlayer->stop();
+    movie->stop();
     this->close();
 }
 
 void MainWindow::on_actionLecture_triggered(bool checked)
 {
     if (progra) return;
-    playControls->setEnabled(true);
-    if (checked) iSPlayer->play();
-    else iSPlayer->pause();
+    if (checked)
+    {
+        if (isMovie)
+        {
+            movie->start();
+            movie->setPaused(false);
+        }
+        else
+        {
+            iSPlayer->play();;
+        }
+    }
+    else
+    {
+        isMovie ? movie->setPaused(true) : iSPlayer->pause();
+    }
 }
 
 void MainWindow::on_actionBoucle_triggered(bool checked)
@@ -162,22 +212,50 @@ void MainWindow::on_actionBoucle_triggered(bool checked)
 void MainWindow::on_actionStop_triggered()
 {
     currentTCLabel->setText("Stoppé");
-    playControls->setEnabled(false);
-    iSPlayer->stop();
+    if (isMovie)
+    {
+        movie->stop();
+        movie->jumpToFrame(0);
+    }
+    else
+    {
+        iSPlayer->stop();
+    }
+
 }
 
 void MainWindow::on_actionImage_Suivante_triggered()
 {
+    if (isMovie)
+    {
+        movie->setPaused(true);
+        if (movie->currentFrameNumber() < movie->frameCount()-1)
+        {
+            movie->jumpToNextFrame();
+        }
+    }
+    else
+    {
         iSPlayer->pause();
         iSPlayer->nextFrame();
+    }
 }
 
 void MainWindow::on_actionImage_pr_c_dente_triggered()
 { 
-
+    if (isMovie)
+    {
+        movie->setPaused(true);
+        if (movie->currentFrameNumber() > 0)
+        {
+            movie->jumpToFrame(movie->currentFrameNumber()-1);
+        }
+    }
+    else
+    {
         iSPlayer->pause();
         iSPlayer->previousFrame();
-
+    }
 }
 
 void MainWindow::on_fpsBox_currentIndexChanged(int index)
@@ -209,18 +287,63 @@ void MainWindow::on_fpsBox_currentIndexChanged(int index)
 
 }
 
+void MainWindow::on_speedBox_valueChanged(double arg1)
+{
+    movie->setSpeed(arg1*100);
+}
+
 void MainWindow::on_zoomButton_currentIndexChanged(int index)
 {
-    if (index == 0) iSPlayer->setZoomFactor(0);
-    else if (index == 1) iSPlayer->setZoomFactor(-1);
-    else if (index == 2) iSPlayer->setZoomFactor(2.0);
-    else if (index == 3) iSPlayer->setZoomFactor(1.5);
-    else if (index == 4) iSPlayer->setZoomFactor(1.0);
-    else if (index == 5) iSPlayer->setZoomFactor(0.75);
-    else if (index == 6) iSPlayer->setZoomFactor(0.5);
-    else if (index == 7) iSPlayer->setZoomFactor(0.25);
-    else if (index == 8) iSPlayer->setZoomFactor(0.12);
-    else if (index == 9) iSPlayer->setZoomFactor(0.05);
+    if (index == 0)
+    {
+        iSPlayer->setZoomFactor(0);
+        movieLabel->setZoomFactor(0);
+    }
+    else if (index == 1)
+    {
+        iSPlayer->setZoomFactor(-1);
+        movieLabel->setZoomFactor(-1);
+    }
+    else if (index == 2)
+    {
+        iSPlayer->setZoomFactor(2.0);
+        movieLabel->setZoomFactor(2.0);
+    }
+    else if (index == 3)
+    {
+        iSPlayer->setZoomFactor(1.5);
+        movieLabel->setZoomFactor(1.5);
+    }
+    else if (index == 4)
+    {
+        iSPlayer->setZoomFactor(1.0);
+        movieLabel->setZoomFactor(1.0);
+    }
+    else if (index == 5)
+    {
+        iSPlayer->setZoomFactor(0.75);
+        movieLabel->setZoomFactor(0.75);
+    }
+    else if (index == 6)
+    {
+        iSPlayer->setZoomFactor(0.5);
+        movieLabel->setZoomFactor(0.5);
+    }
+    else if (index == 7)
+    {
+        iSPlayer->setZoomFactor(0.25);
+        movieLabel->setZoomFactor(0.25);
+    }
+    else if (index == 8)
+    {
+        iSPlayer->setZoomFactor(0.12);
+        movieLabel->setZoomFactor(0.12);
+    }
+    else if (index == 9)
+    {
+        iSPlayer->setZoomFactor(0.05);
+        movieLabel->setZoomFactor(0.05);
+    }
 }
 
 void MainWindow::on_actionParam_tres_triggered()
@@ -258,14 +381,12 @@ void MainWindow::on_actionA_propos_triggered()
     a.exec();
 }
 
-
 //PLAYER SLOTS
 
 void MainWindow::iSDurationChanged(qint64 duration)
 {
     if (duration == 0)
     {
-        playControls->setEnabled(false);
         durationLabel->setText("----");
     }
     else
@@ -289,7 +410,14 @@ void MainWindow::seeked(int position)
         currentTCLabel->setText(QString::number(position));
         repaint();
         if (progra) return;
-        iSPlayer->seek(position);
+        if (isMovie)
+        {
+            movie->jumpToFrame(position);
+        }
+        else
+        {
+            iSPlayer->seek(position);
+        }
 }
 
 void MainWindow::iSStateChanged(QMediaPlayer::State state)
@@ -303,10 +431,30 @@ void MainWindow::iSStateChanged(QMediaPlayer::State state)
     else if (state == QMediaPlayer::StoppedState)
     {
         actionLecture->setChecked(false);
-        playControls->setEnabled(false);
         this->setWindowIcon(QIcon(":/icones/stop"));
     }
     else if (state == QMediaPlayer::PlayingState)
+    {
+        actionLecture->setChecked(true);
+        this->setWindowIcon(QIcon(":/icones/play"));
+    }
+    progra = false;
+}
+
+void MainWindow::movieStateChanged(QMovie::MovieState state)
+{
+    progra = true;
+    if (state == QMovie::Paused)
+    {
+        actionLecture->setChecked(false);
+        this->setWindowIcon(QIcon(":/icones/pause"));
+    }
+    else if (state == QMovie::NotRunning)
+    {
+        actionLecture->setChecked(false);
+        this->setWindowIcon(QIcon(":/icones/stop"));
+    }
+    else if (state == QMovie::Running)
     {
         actionLecture->setChecked(true);
         this->setWindowIcon(QIcon(":/icones/play"));
@@ -318,55 +466,46 @@ void MainWindow::iSStatusChanged(QMediaPlayer::MediaStatus status)
 {
     if (status == QMediaPlayer::UnknownMediaStatus)
     {
-        playControls->setEnabled(true);
         statusLabel->setText("");
         this->setCursor(QCursor(Qt::ArrowCursor));
     }
     if (status == QMediaPlayer::NoMedia)
     {
-        playControls->setEnabled(false);
         statusLabel->setText("Rien à lire");
         this->setCursor(QCursor(Qt::ArrowCursor));
     }
     if (status == QMediaPlayer::LoadingMedia)
     {
-        playControls->setEnabled(true);
         statusLabel->setText("Chargement...");
         this->setCursor(QCursor(Qt::BusyCursor));
     }
     if (status == QMediaPlayer::LoadedMedia)
     {
-        playControls->setEnabled(true);
         statusLabel->setText("----");
         this->setCursor(QCursor(Qt::ArrowCursor));
     }
     if (status == QMediaPlayer::StalledMedia)
     {
-        playControls->setEnabled(true);
         statusLabel->setText("Mise en mémoire tampon...");
         this->setCursor(QCursor(Qt::BusyCursor));
     }
     if (status == QMediaPlayer::BufferingMedia)
     {
-        playControls->setEnabled(true);
         statusLabel->setText("Mise en mémoire tampon...");
         this->setCursor(QCursor(Qt::BusyCursor));
     }
     if (status == QMediaPlayer::BufferedMedia)
     {
-        playControls->setEnabled(true);
         statusLabel->setText("Lecture en streaming");
         this->setCursor(QCursor(Qt::ArrowCursor));
     }
     if (status == QMediaPlayer::EndOfMedia)
     {
-        playControls->setEnabled(false);
         statusLabel->setText("Rien à lire");
         this->setCursor(QCursor(Qt::ArrowCursor));
     }
     if (status == QMediaPlayer::InvalidMedia)
     {
-        playControls->setEnabled(false);
         statusLabel->setText("Média invalide");
         this->setCursor(QCursor(Qt::ArrowCursor));
     }
@@ -540,7 +679,5 @@ void MainWindow::resizeEvent(QResizeEvent* )
         else mainToolBar->setToolButtonStyle(Qt::ToolButtonIconOnly);
     }
 }
-
-
 
 

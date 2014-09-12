@@ -20,6 +20,8 @@ public:
     QStringList getFrames();
     void setTitle(QString t);
     static QStringList getSequence(QString fichierBase);
+    bool isMovie();
+    QString getMovie();
 
 private slots:
     void on_file_clicked();
@@ -39,6 +41,8 @@ private:
     void setRecent(QJsonArray recentArray);
     void addRecent();
     void refreshFavs();
+    bool movie;
+    QString movieFile;
 protected:
     virtual void keyPressEvent(QKeyEvent *event);
 

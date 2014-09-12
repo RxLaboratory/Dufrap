@@ -25,5 +25,5 @@ void FrameLabel::setStart(int s)
 
 void FrameLabel::setEnd(int e)
 {
-    end = s;
+    end = e;
 }
