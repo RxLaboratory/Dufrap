@@ -1,4 +1,5 @@
 #include "isviewer.h"
+#include <QMovie>
 
 
 ISViewer::ISViewer(ISPlayer *p,MovieLabel *m,QWidget *parent) :
@@ -37,12 +38,24 @@ void ISViewer::setZoomFactor(qreal z)
     zoomFactor = z;
     if (zoomFactor > 0)
     {
-        int iW = player->pixmap()->width();
-        int iH = player->pixmap()->height();
-        player->setMinimumHeight(iH*zoomFactor);
-        player->setMaximumHeight(iH*zoomFactor);
-        player->setMinimumWidth(iW*zoomFactor);
-        player->setMaximumWidth(iW*zoomFactor);
+        if (player->isVisible())
+        {
+            int iW = player->pixmap()->width();
+            int iH = player->pixmap()->height();
+            player->setMinimumHeight(iH*zoomFactor);
+            player->setMaximumHeight(iH*zoomFactor);
+            player->setMinimumWidth(iW*zoomFactor);
+            player->setMaximumWidth(iW*zoomFactor);
+        }
+        else if (movie->isVisible())
+        {
+            int iW = movie->movie()->currentPixmap().width();
+            int iH = movie->movie()->currentPixmap().height();
+            movie->setMinimumHeight(iH*zoomFactor);
+            movie->setMaximumHeight(iH*zoomFactor);
+            movie->setMinimumWidth(iW*zoomFactor);
+            movie->setMaximumWidth(iW*zoomFactor);
+        }
     }
     else
     {
@@ -52,12 +65,30 @@ void ISViewer::setZoomFactor(qreal z)
 
 void ISViewer::resizePlayer()
 {
-    if (!player->pixmap()) return;
-    if (player->pixmap()->width() == 0 || player->pixmap()->height() == 0) return;
+    int iW;
+    int iH;
+    qreal ratio;
 
-    int iW = player->pixmap()->width();
-    int iH = player->pixmap()->height();
-    qreal ratio = (iW + 0.0) / iH;
+    if (player->isVisible())
+    {
+        if (!player->pixmap()) return;
+        if (player->pixmap()->width() == 0 || player->pixmap()->height() == 0) return;
+
+        iW = player->pixmap()->width();
+        iH = player->pixmap()->height();
+        ratio = (iW + 0.0) / iH;
+    }
+    else if (movie->isVisible())
+    {
+        if (!movie->movie()) return;
+        if (!movie->movie()->currentPixmap()) return;
+
+        iW = movie->movie()->currentPixmap().width();
+        iH = movie->movie()->currentPixmap().height();
+        ratio = (iW + 0.0) / iH;
+    }
+    else return;
+
     int currentW = this->width();
     int currentH = this->height();
     qreal currentRatio = (currentW + 0.0) / currentH;
@@ -74,11 +105,24 @@ void ISViewer::resizePlayer()
             iH = currentH;
             iW = iH*ratio;
         }
-        player->setMinimumHeight(iH);
-        player->setMaximumHeight(iH);
-        player->setMinimumWidth(iW);
-        player->setMaximumWidth(iW);
+        if (player->isVisible())
+        {
+            player->setMinimumHeight(iH);
+            player->setMaximumHeight(iH);
+            player->setMinimumWidth(iW);
+            player->setMaximumWidth(iW);
+        }
+        else if (movie->isVisible())
+        {
+            movie->setMinimumHeight(iH);
+            movie->setMaximumHeight(iH);
+            movie->setMinimumWidth(iW);
+            movie->setMaximumWidth(iW);
+        }
+
     }
+
+
 }
 
 void ISViewer::resizeEvent(QResizeEvent*)

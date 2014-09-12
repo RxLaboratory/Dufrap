@@ -155,6 +155,7 @@ void MainWindow::on_actionOuvrir_triggered()
                 fpsBox->hide();
                 bufferBar->hide();
                 speedBox->show();
+                statusLabel->hide();
                 speedBox->setValue(1.0);
                 isMovie = true;
                 movieLabel->setMovieFile(o.getMovie());
@@ -168,6 +169,7 @@ void MainWindow::on_actionOuvrir_triggered()
                 fpsBox->show();
                 bufferBar->show();
                 speedBox->hide();
+                statusLabel->show();
                 isMovie = false;
                 addFrames(o.getFrames());
                 iSViewer->resizePlayer();
@@ -297,52 +299,42 @@ void MainWindow::on_zoomButton_currentIndexChanged(int index)
     if (index == 0)
     {
         iSViewer->setZoomFactor(0);
-        movieLabel->setZoomFactor(0);
     }
     else if (index == 1)
     {
         iSViewer->setZoomFactor(-1);
-        movieLabel->setZoomFactor(-1);
     }
     else if (index == 2)
     {
         iSViewer->setZoomFactor(2.0);
-        movieLabel->setZoomFactor(2.0);
     }
     else if (index == 3)
     {
         iSViewer->setZoomFactor(1.5);
-        movieLabel->setZoomFactor(1.5);
     }
     else if (index == 4)
     {
         iSViewer->setZoomFactor(1.0);
-        movieLabel->setZoomFactor(1.0);
     }
     else if (index == 5)
     {
         iSViewer->setZoomFactor(0.75);
-        movieLabel->setZoomFactor(0.75);
     }
     else if (index == 6)
     {
         iSViewer->setZoomFactor(0.5);
-        movieLabel->setZoomFactor(0.5);
     }
     else if (index == 7)
     {
         iSViewer->setZoomFactor(0.25);
-        movieLabel->setZoomFactor(0.25);
     }
     else if (index == 8)
     {
         iSViewer->setZoomFactor(0.12);
-        movieLabel->setZoomFactor(0.12);
     }
     else if (index == 9)
     {
         iSViewer->setZoomFactor(0.05);
-        movieLabel->setZoomFactor(0.05);
     }
 }
 
@@ -618,12 +610,14 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
     {
         if (!event->isAutoRepeat())
         {
-            iSPlayer->pause();
+            if (isMovie) movie->setPaused(true);
+            else iSPlayer->pause();
             on_actionImage_Suivante_triggered();
         }
         else
         {
-            iSPlayer->play(true);
+            if (isMovie) movie->start();
+            else iSPlayer->play(true);
         }
         event->accept();
     }
@@ -631,18 +625,19 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
     {
         if (!event->isAutoRepeat())
         {
-            iSPlayer->pause();
+            if (isMovie) movie->setPaused(true);
+            else iSPlayer->pause();
             on_actionImage_pr_c_dente_triggered();
         }
         else
         {
-            iSPlayer->reversePlay();
+            if (!isMovie) iSPlayer->reversePlay();
         }
         event->accept();
     }
     else if (event->key() == Qt::Key_Up)
     {
-        if (zoomButton->currentIndex() > 3) zoomButton->setCurrentIndex(zoomButton->currentIndex()-1);
+        if (zoomButton->currentIndex() > 0) zoomButton->setCurrentIndex(zoomButton->currentIndex()-1);
     }
     else if (event->key() == Qt::Key_Down)
     {

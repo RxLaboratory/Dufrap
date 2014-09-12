@@ -13,14 +13,11 @@ public:
 signals:
 
 public slots:
-    void setZoomFactor(qreal z);
+
 private:
-    qreal zoomFactor; // -1 auto ; 0 Auto until 100%
-    void adaptSize();
-    int iWidth;
-    int iHeight;
+
 protected:
-    void resizeEvent(QResizeEvent*);
+
 
 };
 
