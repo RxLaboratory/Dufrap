@@ -124,16 +124,16 @@
         <number>10</number>
        </property>
        <property name="leftMargin">
-        <number>2</number>
+        <number>0</number>
        </property>
        <property name="topMargin">
-        <number>5</number>
+        <number>0</number>
        </property>
        <property name="rightMargin">
-        <number>2</number>
+        <number>0</number>
        </property>
        <property name="bottomMargin">
-        <number>5</number>
+        <number>0</number>
        </property>
        <item>
         <spacer name="horizontalSpacer">
@@ -163,6 +163,9 @@
        </item>
        <item>
         <widget class="QComboBox" name="zoomButton">
+         <property name="focusPolicy">
+          <enum>Qt::NoFocus</enum>
+         </property>
          <property name="currentIndex">
           <number>0</number>
          </property>
@@ -226,6 +229,9 @@
        </item>
        <item>
         <widget class="QComboBox" name="fpsBox">
+         <property name="focusPolicy">
+          <enum>Qt::NoFocus</enum>
+         </property>
          <property name="currentIndex">
           <number>5</number>
          </property>
@@ -299,6 +305,9 @@
            <width>16777215</width>
            <height>16</height>
           </size>
+         </property>
+         <property name="focusPolicy">
+          <enum>Qt::NoFocus</enum>
          </property>
          <property name="frame">
           <bool>false</bool>

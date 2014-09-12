@@ -9,6 +9,7 @@
 #include "bufferslider.h"
 #include <QMovie>
 #include "movielabel.h"
+#include "isviewer.h"
 #ifdef Q_OS_WIN
 #include <QWinTaskbarButton>
 #include <QWinTaskbarProgress>
@@ -47,6 +48,7 @@ private slots:
 
 private:
     void addFrames(QStringList f);
+    ISViewer *iSViewer; //container for players
     ISPlayer *iSPlayer; //Image sequence player and widget
     MovieLabel *movieLabel; //label displaying movie (GIF or MNG file)
     QMovie *movie; //movie player

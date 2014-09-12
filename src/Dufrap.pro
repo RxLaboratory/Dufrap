@@ -26,7 +26,8 @@ SOURCES += main.cpp\
     params.cpp \
     about.cpp \
     bufferslider.cpp \
-    movielabel.cpp
+    movielabel.cpp \
+    isviewer.cpp
 
 HEADERS  += mainwindow.h \
     opener.h \
@@ -38,13 +39,15 @@ HEADERS  += mainwindow.h \
     params.h \
     about.h \
     bufferslider.h \
-    movielabel.h
+    movielabel.h \
+    isviewer.h
 
 FORMS    += mainwindow.ui \
     opener.ui \
     params.ui \
     about.ui \
-    bufferslider.ui
+    bufferslider.ui \
+    isviewer.ui
 
 RESOURCES += \
     ressources.qrc

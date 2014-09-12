@@ -9,7 +9,6 @@ MovieLabel::MovieLabel(QWidget *parent) :
 
     this->setScaledContents(false);
     this->setSizePolicy(QSizePolicy::Ignored,QSizePolicy::Ignored);
-    this->setAlignment(Qt::AlignCenter);
 }
 
 void MovieLabel::setMovieFile(QString f)

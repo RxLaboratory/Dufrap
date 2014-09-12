@@ -1,13 +1,11 @@
 #ifndef ISPLAYER_H
 #define ISPLAYER_H
-
 #include <QLabel>
 #include <QTimer>
 #include <QMediaPlayer>
 #include <QCoreApplication>
 #include <QElapsedTimer>
 #include "imagebuffer.h"
-
 class ISPlayer : public QLabel
 {
     Q_OBJECT
@@ -19,7 +17,6 @@ public:
     void setBufferMaxSize(int m);
     void setBufferAhead(int b);
     void setSkipFrames(bool s);
-
 signals:
     void frameChanged(int frame);
     void stateChanged(QMediaPlayer::State);
@@ -29,7 +26,6 @@ signals:
     void frameTime(qint64 ms);
     void removedFrameFromBuffer(int f);
     void adddedFrameToBuffer(int f);
-
 public slots:
     void play(bool ignoreEmptyBuffer = false);
     void reversePlay();
@@ -40,8 +36,6 @@ public slots:
     void seek(int f);
     void setFrameRate(qreal fr);
     void newBufferedFrame(BufferedFrame *f);
-    void setZoomFactor(qreal z);
-
 private:
     qreal frameRate;
     int currentFrame;
@@ -56,7 +50,6 @@ private:
     bool playing;
     bool stopped;
     bool progra;
-    qreal zoomFactor; // -1 auto ; 0 Auto until 100%
     QTimer *displayTimer;
     QTimer *reverseTimer;
     QList<UnBufferedFrame> frames;
@@ -72,10 +65,6 @@ private:
     void displayFrame(int f);
     void requestBuffering();
     QSize playerSize;
-protected:
-    void resizeEvent(QResizeEvent*);
-
 
 };
-
 #endif // ISPLAYER_H

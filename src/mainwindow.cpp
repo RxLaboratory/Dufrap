@@ -13,9 +13,10 @@ MainWindow::MainWindow(int argc, char *argv[], QWidget *parent) :
 {
     progra = true;
     setupUi(this);
-
+qDebug() << "starting";
     //widgets and players
     iSPlayer = new ISPlayer(this);
+
     movieLabel = new MovieLabel(this);
     movie = new QMovie(this);
     movieLabel->setMovie(movie);
@@ -42,15 +43,15 @@ MainWindow::MainWindow(int argc, char *argv[], QWidget *parent) :
     connect(iSPlayer,&ISPlayer::frameTime,this,&MainWindow::evalFramerate);
     connect(iSPlayer,&ISPlayer::adddedFrameToBuffer,bufferSlider,&BufferSlider::setBufferedFrame);
     connect(iSPlayer,&ISPlayer::removedFrameFromBuffer,bufferSlider,&BufferSlider::setUnBufferedFrame);
-    mainLayout->insertWidget(0,iSPlayer);
+
     iSPlayer->setFrameRate(25);
 
     //configuring movie player
     connect(movie,&QMovie::frameChanged,this,&MainWindow::iSPositionChanged);
     connect(movie,&QMovie::stateChanged,this,&MainWindow::movieStateChanged);
-    mainLayout->insertWidget(0,movieLabel);
-
-    movieLabel->hide();
+qDebug() << "creating isviewer";
+    iSViewer = new ISViewer(iSPlayer,movieLabel,this);
+    mainLayout->insertWidget(0,iSViewer);
     isMovie = false;
 
     //récupérer les params enregistrés
@@ -150,8 +151,7 @@ void MainWindow::on_actionOuvrir_triggered()
             //ajoute
             if (o.isMovie())
             {
-                iSPlayer->hide();
-                movieLabel->show();
+                iSViewer->setMovie(true);
                 fpsBox->hide();
                 bufferBar->hide();
                 speedBox->show();
@@ -164,13 +164,13 @@ void MainWindow::on_actionOuvrir_triggered()
             }
             else
             {
-                iSPlayer->show();
-                movieLabel->hide();
+                iSViewer->setMovie(false);
                 fpsBox->show();
                 bufferBar->show();
                 speedBox->hide();
                 isMovie = false;
                 addFrames(o.getFrames());
+                iSViewer->resizePlayer();
             }
 
         }
@@ -296,52 +296,52 @@ void MainWindow::on_zoomButton_currentIndexChanged(int index)
 {
     if (index == 0)
     {
-        iSPlayer->setZoomFactor(0);
+        iSViewer->setZoomFactor(0);
         movieLabel->setZoomFactor(0);
     }
     else if (index == 1)
     {
-        iSPlayer->setZoomFactor(-1);
+        iSViewer->setZoomFactor(-1);
         movieLabel->setZoomFactor(-1);
     }
     else if (index == 2)
     {
-        iSPlayer->setZoomFactor(2.0);
+        iSViewer->setZoomFactor(2.0);
         movieLabel->setZoomFactor(2.0);
     }
     else if (index == 3)
     {
-        iSPlayer->setZoomFactor(1.5);
+        iSViewer->setZoomFactor(1.5);
         movieLabel->setZoomFactor(1.5);
     }
     else if (index == 4)
     {
-        iSPlayer->setZoomFactor(1.0);
+        iSViewer->setZoomFactor(1.0);
         movieLabel->setZoomFactor(1.0);
     }
     else if (index == 5)
     {
-        iSPlayer->setZoomFactor(0.75);
+        iSViewer->setZoomFactor(0.75);
         movieLabel->setZoomFactor(0.75);
     }
     else if (index == 6)
     {
-        iSPlayer->setZoomFactor(0.5);
+        iSViewer->setZoomFactor(0.5);
         movieLabel->setZoomFactor(0.5);
     }
     else if (index == 7)
     {
-        iSPlayer->setZoomFactor(0.25);
+        iSViewer->setZoomFactor(0.25);
         movieLabel->setZoomFactor(0.25);
     }
     else if (index == 8)
     {
-        iSPlayer->setZoomFactor(0.12);
+        iSViewer->setZoomFactor(0.12);
         movieLabel->setZoomFactor(0.12);
     }
     else if (index == 9)
     {
-        iSPlayer->setZoomFactor(0.05);
+        iSViewer->setZoomFactor(0.05);
         movieLabel->setZoomFactor(0.05);
     }
 }
@@ -639,6 +639,14 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
             iSPlayer->reversePlay();
         }
         event->accept();
+    }
+    else if (event->key() == Qt::Key_Up)
+    {
+        if (zoomButton->currentIndex() > 3) zoomButton->setCurrentIndex(zoomButton->currentIndex()-1);
+    }
+    else if (event->key() == Qt::Key_Down)
+    {
+        if (zoomButton->currentIndex() < 9) zoomButton->setCurrentIndex(zoomButton->currentIndex()+1);
     }
     else
     {
