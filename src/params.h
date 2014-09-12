@@ -27,6 +27,9 @@ public:
     Qt::ToolButtonStyle getStyle();
     void setStyle(Qt::ToolButtonStyle style);
 
+    void setLastBrowsed(QString l);
+    QString getLastBrowsed();
+
 private slots:
     void on_maxSlider_valueChanged(int value);
     void on_buttonBox_accepted();
@@ -36,6 +39,7 @@ private:
     QJsonObject getParams();
     void setParams(QJsonObject p);
     bool buttonStyleAuto;
+    QString lastBrowsed;
 protected:
     void resizeEvent(QResizeEvent*);
 };

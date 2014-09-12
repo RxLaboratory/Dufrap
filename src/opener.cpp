@@ -4,6 +4,7 @@
 #include <QMessageBox>
 #include <QMovie>
 #include <QtDebug>
+#include "params.h"
 
 Opener::Opener(QWidget *parent) :
     QDialog(parent)
@@ -118,8 +119,10 @@ QStringList Opener::getSequence(QString fichierBase)
 
 void Opener::on_file_clicked()
 {
+    Params p;
+
     //demande les fichiers
-    QString fichier = QFileDialog::getOpenFileName(this,"Ouvrir une séquence d'images");
+    QString fichier = QFileDialog::getOpenFileName(this,"Ouvrir une séquence d'images",p.getLastBrowsed());
 
         if (fichier != "")
         {
@@ -134,6 +137,11 @@ void Opener::on_file_clicked()
                 movie = false;
             }
 
+            //enregistrer le dossier utilisé
+            QString d = fichier.section("/",0,-2);
+
+            p.setLastBrowsed(d);
+
             addRecent();
 
             accept();
@@ -145,8 +153,9 @@ void Opener::on_file_clicked()
 
 void Opener::on_folder_clicked()
 {
+    Params p;
 
-    QString dossier = QFileDialog::getExistingDirectory(this,"Ouvrir un dossier");
+    QString dossier = QFileDialog::getExistingDirectory(this,"Ouvrir un dossier",p.getLastBrowsed());
     if (dossier != "")
     {
 
@@ -158,6 +167,8 @@ void Opener::on_folder_clicked()
 
             //recent
             addRecent();
+
+            p.setLastBrowsed(dossier.section("/",0,-2));
 
             accept();
     }
