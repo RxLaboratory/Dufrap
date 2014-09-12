@@ -13,7 +13,6 @@ MainWindow::MainWindow(int argc, char *argv[], QWidget *parent) :
 {
     progra = true;
     setupUi(this);
-qDebug() << "starting";
     //widgets and players
     iSPlayer = new ISPlayer(this);
 
@@ -49,7 +48,6 @@ qDebug() << "starting";
     //configuring movie player
     connect(movie,&QMovie::frameChanged,this,&MainWindow::iSPositionChanged);
     connect(movie,&QMovie::stateChanged,this,&MainWindow::movieStateChanged);
-qDebug() << "creating isviewer";
     iSViewer = new ISViewer(iSPlayer,movieLabel,this);
     mainLayout->insertWidget(0,iSViewer);
     isMovie = false;
@@ -369,7 +367,7 @@ void MainWindow::on_actionParam_tres_triggered()
 
 void MainWindow::on_actionA_propos_triggered()
 {
-    About a(this);
+    About a(0);
     a.exec();
 }
 
