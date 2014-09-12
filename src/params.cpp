@@ -24,6 +24,8 @@ Params::Params(QWidget *parent) :
     setSkipFrames(params.value("skipFrames").toBool());
     setLastBrowsed(params.value("lastBrowsed").toString());
     setLastFPS(params.value("lastFPS").toDouble());
+
+    tabWidget->setCurrentIndex(0);
     progra = false;
 }
 
