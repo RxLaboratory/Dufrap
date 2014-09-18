@@ -24,6 +24,8 @@ ISPlayer::ISPlayer(QWidget *parent) :
     loop = false;
     this->setScaledContents(true);
     this->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
+
+    requestBufferTimer.start();
 }
 
 void ISPlayer::setBufferEnabled(bool b)
@@ -198,11 +200,19 @@ void ISPlayer::displayFrame(int f)
 
 void ISPlayer::requestBuffering()
 {
-    QList<UnBufferedFrame> requestFrames;
+
     //laisser le temps au buffer de se stopper avant de le redémarrer
     QElapsedTimer timer;
     timer.start();
+
     imageBuffer->stop();
+
+
+
+    QList<UnBufferedFrame> requestFrames;
+
+    if(currentFrame < 0 || currentFrame >= frames.count()) return;
+
     if (forward)
     {
         for (int i = currentFrame;i<frames.count();i++)
@@ -223,7 +233,7 @@ void ISPlayer::requestBuffering()
             }
         }
     }
-    while(!timer.hasExpired(100))
+    while(!timer.hasExpired(300))
         QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
     imageBuffer->setFrames(requestFrames);
     imageBuffer->start();
@@ -250,6 +260,7 @@ void ISPlayer::setFrames(QStringList f)
     emit durationChanged(frames.count()-1);
     //se remettre au début
     displayFrame(0);
+    requestBuffering();
 }
 
 void ISPlayer::setFrameRate(qreal fr)
@@ -341,7 +352,7 @@ void ISPlayer::pause()
     paused = true;
     stopped = false;
     playing = false;
-    imageBuffer->stop();
+    //imageBuffer->stop();
     emit stateChanged(QMediaPlayer::PausedState);
 }
 
@@ -420,9 +431,18 @@ void ISPlayer::previousFrame()
 
 void ISPlayer::seek(int f)
 {
+
+
     if (f < 0 || f > frames.count()-1) return;
     pause();
     displayFrame(f);
+
+    if (!requestBufferTimer.hasExpired(500))
+    {
+        return;
+    }
+    requestBufferTimer.start();
+    requestBuffering();
 }
 
 int ISPlayer::getCurrentFrame()

@@ -60,6 +60,7 @@ private:
     ImageBuffer *imageBuffer;
     QElapsedTimer frameTimer;
     QElapsedTimer seekTimer;
+    QElapsedTimer requestBufferTimer;
     void emptyBuffer();
     void insertBufferedFrame(BufferedFrame *f);
     bool removeFirstBufferedFrame();
