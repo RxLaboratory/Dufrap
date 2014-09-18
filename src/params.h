@@ -39,11 +39,15 @@ public:
     QStringList getRVB();
     void setRVB(QList<int> c);
 
+    void setLanguage(QString l);
+    QString getLanguage();
+
 private slots:
     void on_maxSlider_valueChanged(int value);
     void on_buttonBox_accepted();
     void on_buttonBox_rejected();
     void on_comboBox_activated(int index);
+    void on_languageBox_activated(int index);
 
 private:
     QJsonObject getParams();
@@ -52,6 +56,7 @@ private:
     QString lastBrowsed;
     double lastFPS;
     bool progra;
+    QString languageFile;
 protected:
     void resizeEvent(QResizeEvent*);
 };

@@ -55,4 +55,8 @@ RESOURCES += \
 OTHER_FILES += \
     ico.rc
 
+TRANSLATIONS = dufrap_fr.ts \
+               dufrap_en.ts
+
+
 RC_FILE = ico.rc

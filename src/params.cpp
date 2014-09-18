@@ -1,5 +1,6 @@
 #include "params.h"
 #include <QtDebug>
+#include <QFileDialog>
 
 Params::Params(QWidget *parent) :
     QDialog(parent)
@@ -18,13 +19,14 @@ Params::Params(QWidget *parent) :
     QList<int> rvb;
     rvb << params.value("rBG").toInt() << params.value("vBG").toInt() << params.value("bBG").toInt();
     setRVB(rvb);
+    languageFile = params.value("language").toString();
     setBufferEnabled(params.value("bufferEnabled").toBool());
     setBufferMaxSize(params.value("bufferMaxSize").toInt());
     setBufferAhead(params.value("bufferAhead").toInt());
     setSkipFrames(params.value("skipFrames").toBool());
     setLastBrowsed(params.value("lastBrowsed").toString());
     setLastFPS(params.value("lastFPS").toDouble());
-
+    setLanguage(languageFile);
     tabWidget->setCurrentIndex(0);
     progra = false;
 }
@@ -199,6 +201,32 @@ int Params::getNumRecents()
     return numRecentsSpinner->value();
 }
 
+void Params::setLanguage(QString l)
+{
+    if (l == "languages/dufrap_en") languageBox->setCurrentIndex(1);
+    else if (l == "languages/dufrap_fr") languageBox->setCurrentIndex(0);
+    else languageBox->setCurrentIndex(2);
+}
+
+QString Params::getLanguage()
+{
+    return languageFile;
+}
+
+void Params::on_languageBox_activated(int index)
+{
+    if (index == 0) languageFile = "languages/dufrap_fr";
+    else if (index == 1) languageFile = "languages/dufrap_en";
+    else
+    {
+        QString l = QFileDialog::getOpenFileName(this,tr("Choisir un fichier de traduction"),QString(),tr("Fichier de langue (*.qm)"));
+        if (l!="")
+        {
+            languageFile = l;
+        }
+    }
+}
+
 QStringList Params::getRVB()
 {
     QStringList rvb;
@@ -242,6 +270,7 @@ QJsonObject Params::getParams()
         params.insert("rBG",-1);
         params.insert("vBG",-1);
         params.insert("bBG",-1);
+        params.insert("language","languages/dufrap_" + QLocale::system().name());
         paramsDoc.setObject(params);
         if (paramsFile.open(QIODevice::WriteOnly | QIODevice::Text))
         {
@@ -281,6 +310,7 @@ void Params::on_buttonBox_accepted()
     params.insert("rBG",rSpinner->value());
     params.insert("vBG",vSpinner->value());
     params.insert("bBG",bSpinner->value());
+    params.insert("language",languageFile);
     setParams(params);
     accept();
 }
