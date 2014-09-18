@@ -6,7 +6,7 @@
 int main(int argc, char *argv[])
 {
     QTranslator translator;
-    translator.load("languages/dumep_" + QLocale::system().name());
+    translator.load("languages/dufrap_" + QLocale::system().name());
     QApplication a(argc, argv);
     Params p;
     translator.load(p.getLanguage());
