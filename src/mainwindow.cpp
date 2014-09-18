@@ -346,7 +346,8 @@ void MainWindow::on_actionParam_tres_triggered()
         if (style == Qt::ToolButtonFollowStyle)
         {
             buttonStyleAuto = true;
-            resizeEvent(&QResizeEvent(this->size(),this->size()));
+            QResizeEvent re(this->size(),this->size());
+            resizeEvent(&re);
         }
         else
         {
@@ -689,5 +690,4 @@ void MainWindow::resizeEvent(QResizeEvent* )
         else mainToolBar->setToolButtonStyle(Qt::ToolButtonIconOnly);
     }
 }
-
 
