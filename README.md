@@ -7,4 +7,4 @@ A simple and lightweight image sequence player.
 
 ###Dependecies
 
-Qt >= 5.3.0
+Qt >= 5.1.0
