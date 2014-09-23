@@ -85,20 +85,6 @@ MainWindow::MainWindow(int argc, char *argv[], QWidget *parent) :
 
     progra = false;
 
-    //load arguments
-    if (argc > 1)
-    {
-        QStringList frames = Opener::getSequence(argv[1]);
-        if (frames.count() > 0)
-        {
-            //stoppe
-            iSPlayer->stop();
-            //ajoute
-            addFrames(frames);
-        }
-
-    }
-
 
     //Ajouter les contrôles dans la TaskBar si win
 #ifdef Q_OS_WIN
@@ -115,6 +101,43 @@ MainWindow::MainWindow(int argc, char *argv[], QWidget *parent) :
     connect(seekBar, SIGNAL(valueChanged(int)), taskbarProgress, SLOT(setValue(int)));
 #endif
 
+    //load arguments
+    if (argc > 1)
+    {
+        QString fichier = argv[1];
+        if (QMovie::supportedFormats().contains(fichier.section(".",-1).toLower().toUtf8()))
+        {
+            iSViewer->setMovie(true);
+            fpsBox->hide();
+            bufferBar->hide();
+            speedBox->show();
+            statusLabel->hide();
+            speedBox->setValue(1.0);
+            isMovie = true;
+            movieLabel->setMovieFile(fichier);
+            seekBar->setMaximum(movie->frameCount());
+            //displaying first frame
+            movie->jumpToFrame(0);
+        }
+        else
+        {
+            QStringList frames = Opener::getSequence(fichier);
+            if (frames.count() > 0)
+            {
+                iSViewer->setMovie(false);
+                fpsBox->show();
+                bufferBar->show();
+                speedBox->hide();
+                statusLabel->show();
+                isMovie = false;
+                //ajoute
+                addFrames(frames);
+            }
+        }
+
+    }
+
+
 }
 
 
@@ -123,6 +146,7 @@ MainWindow::MainWindow(int argc, char *argv[], QWidget *parent) :
 void MainWindow::addFrames(QStringList f)
 {
     iSPlayer->setFrames(f);
+    iSViewer->resizePlayer();
 }
 
 //BUTTONS
@@ -160,7 +184,6 @@ void MainWindow::on_actionOuvrir_triggered()
                 statusLabel->show();
                 isMovie = false;
                 addFrames(o.getFrames());
-                iSViewer->resizePlayer();
             }
 
         }
