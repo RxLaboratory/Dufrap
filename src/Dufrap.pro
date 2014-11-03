@@ -6,8 +6,7 @@
 
 QT       += core gui\
          multimedia\
-         multimediawidgets\
-         winextras
+         multimediawidgets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -54,9 +53,5 @@ RESOURCES += \
 
 OTHER_FILES += \
     ico.rc
-
-TRANSLATIONS = dufrap_fr.ts \
-               dufrap_en.ts
-
 
 RC_FILE = ico.rc
