@@ -105,6 +105,9 @@ MainWindow::MainWindow(int argc, char *argv[], QWidget *parent) :
     if (argc > 1)
     {
         QString fichier = argv[1];
+#ifdef Q_OS_WIN
+        fichier = QString::fromLatin1(argv[1]);
+#endif
         if (QMovie::supportedFormats().contains(fichier.section(".",-1).toLower().toUtf8()))
         {
             iSViewer->setMovie(true);
